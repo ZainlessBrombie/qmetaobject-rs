@@ -413,7 +413,6 @@ fn expand_macro(func: TargetFunc, data: Data) -> TokenStream {
         as_str.push(HEXES[(b >> 4) as usize]);
         as_str.push(HEXES[(b % 16) as usize]);
     }
-    let payload = ::proc_macro2::TokenStream::new();
 
     let q = quote! {
         #vis fn #ident() {
