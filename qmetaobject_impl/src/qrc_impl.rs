@@ -419,12 +419,11 @@ fn expand_macro(func: TargetFunc, data: Data) -> TokenStream {
             use ::std::sync::Once;
             static INIT_RESOURCES: Once = Once::new();
             INIT_RESOURCES.call_once(|| {
-                static PAYLOAD : &'static [u8] = & [ #payload ];
                 static NAMES : &'static [u8] = & [ #(#names),* ];
                 static TREE_DATA : &'static [u8] = & [ #(#tree_data),* ];
                 const PAYLOAD_STR: &str = #as_str;
 
-                static mut payload: [u8; PAYLOAD_STR.len() / 2] = [0u8; PAYLOAD_STR.len() / 2];
+                static mut PAYLOAD: [u8; PAYLOAD_STR.len() / 2] = [0u8; PAYLOAD_STR.len() / 2];
 
                 unsafe {
                     fn hex_to_byte(a: u8) -> u8 {
@@ -435,12 +434,12 @@ fn expand_macro(func: TargetFunc, data: Data) -> TokenStream {
                         }
                         panic!("That value was not a valid hex ascii")
                     }
-                    for i in 0..(payload.len()) {
-                        payload[i] = hex_to_byte(PAYLOAD_STR.as_bytes()[i * 2]) * 16
+                    for i in 0..(PAYLOAD.len()) {
+                        PAYLOAD[i] = hex_to_byte(PAYLOAD_STR.as_bytes()[i * 2]) * 16
                             + hex_to_byte(PAYLOAD_STR.as_bytes()[i * 2 + 1]);
                     }
                 }
-                unsafe { ::qmetaobject::qrc::register_resource_data(2, TREE_DATA, NAMES, &payload) };
+                unsafe { ::qmetaobject::qrc::register_resource_data(2, TREE_DATA, NAMES, &PAYLOAD) };
                 // Because we want that the macro re-compiles if the contents of the file changes!
                 #({ const _X: &'static [ u8 ] = include_bytes!(#files); })*
             });
